@@ -1,0 +1,37 @@
+---
+- name: Deploy Nginx web app on VM
+  hosts: web_servers
+  become: yes
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Start Nginx service
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Deploy a simple HTML page
+      copy:
+        content: |
+          <html>
+          <head>
+            <title>My Nginx Web App</title>
+          </head>
+          <body>
+            <h1>Welcome to my Nginx Web App!</h1>
+          </body>
+          </html>
+        dest: /var/www/html/index.html
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Ensure firewall allows HTTP traffic
+      ufw:
+        rule: allow
+        name: 'Nginx Full'
